@@ -13,13 +13,13 @@ export default function CallToAction() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
-            href="https://app.alertsil.com/register" 
+            href="#contact" 
             className="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl"
           >
             Crear Cuenta Gratis
           </Link>
           <Link 
-            href="mailto:info@alertsil.com" 
+            href="mailto:info@effizy.es" 
             className="px-8 py-4 border-2 border-white text-white rounded-xl font-bold text-lg hover:bg-white hover:text-blue-600 transition-all"
           >
             Contactar Ventas

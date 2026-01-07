@@ -115,9 +115,6 @@ export default function Pricing() {
 
         {/* Pie de precios */}
         <div className="mt-16 text-center space-y-4">
-          <p className="text-gray-500 text-sm italic">
-            * Precios netos sin IVA. Facturación mensual simplificada.
-          </p>
           <div className="flex flex-wrap justify-center gap-6 text-gray-400 text-xs font-medium uppercase tracking-widest">
             <span>Sin permanencia</span>
             <span>•</span>

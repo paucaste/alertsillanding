@@ -52,7 +52,7 @@ export default function Hero() {
                     </div>
 
                     {/* Estadísticas */}
-                    <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-gray-100 pt-12 max-w-4xl mx-auto">
+                    {/* <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-gray-100 pt-12 max-w-4xl mx-auto">
                         <div>
                             <p className="text-3xl font-bold text-gray-900">0.5s</p>
                             <p className="text-sm text-gray-500 uppercase tracking-wider">Latencia de Alerta</p>
@@ -65,7 +65,7 @@ export default function Hero() {
                             <p className="text-3xl font-bold text-gray-900">24/7</p>
                             <p className="text-sm text-gray-500 uppercase tracking-wider">Monitoreo Activo</p>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
