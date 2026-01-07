@@ -12,7 +12,7 @@ export default function Header() {
         </div>
         
         <div className="flex items-center gap-4">
-          <Link href="https://app.alertsil.com/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+          <Link href="https://alertsil-admin-panel.vercel.app/" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Entrar
           </Link>
           <Link href="https://app.alertsil.com/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md shadow-blue-100">
