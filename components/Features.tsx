@@ -1,15 +1,12 @@
 'use client';
 import {
-    BoltIcon,
-    UsersIcon,
-    ShieldCheckIcon,
-    MegaphoneIcon // Cambiado para enfatizar la difusión de la alerta
-} from '@heroicons/react/24/outline';
-import {
     ShieldExclamationIcon,
     SignalIcon,
-    LockClosedIcon,
-    UserGroupIcon
+    UserGroupIcon,
+    SpeakerXMarkIcon, // Mejor para alarmas silenciosas
+    ClockIcon,
+    CloudArrowDownIcon,
+    CpuChipIcon
 } from '@heroicons/react/24/outline';
 
 const features = [
@@ -19,18 +16,28 @@ const features = [
         icon: ShieldExclamationIcon,
     },
     {
-        name: 'Seguridad del Trabajador',
-        description: 'Diseñado específicamente para entornos industriales donde la rapidez de respuesta es clave.',
-        icon: UserGroupIcon,
+        name: 'Alarmas Silenciosas',
+        description: 'Notifica discretamente a seguridad sin alertar a intrusos ni causar pánico innecesario.',
+        icon: SpeakerXMarkIcon,
     },
     {
-        name: 'Alarmas Silenciosas',
-        description: 'Notifica discretamente a los equipos de seguridad o brigadas de emergencia sin alertar a posibles intrusos o causar pánico innecesario.',
-        icon: MegaphoneIcon,
+        name: 'Instalación en 30s',
+        description: 'Sin manuales complejos ni formación. Descargar, instalar y empezar a proteger.',
+        icon: CloudArrowDownIcon,
+    },
+    {
+        name: 'Cero Mantenimiento',
+        description: 'Se ejecuta silenciosamente en segundo plano. Ni lo verás, hasta que lo necesites.',
+        icon: ClockIcon,
+    },
+    {
+        name: 'Ligereza Total',
+        description: 'Optimizado para no consumir recursos. Tu equipo seguirá volando mientras está protegido.',
+        icon: CpuChipIcon,
     },
     {
         name: 'Conectividad Crítica',
-        description: 'Monitoreo constante del estado de los equipos para asegurar que siempre estén listos para recibir la señal.',
+        description: 'Monitoreo constante del estado de los equipos para asegurar una red siempre lista.',
         icon: SignalIcon,
     },
 ];
@@ -44,19 +51,22 @@ export default function Features() {
                         Comunicación crítica en cadena: de uno a todos
                     </h2>
                     <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                        Nuestro software centraliza la seguridad en un solo panel. Al activar la alerta, el sistema
-                        <strong> replica la señal instantáneamente a cada equipo conectado</strong> de la compañía,
-                        eliminando los tiempos de aviso manual y garantizando que toda la organización reaccione al unísono.
+                        Nuestro software centraliza la seguridad en un solo panel. Al activar la alerta, el sistema 
+                        <strong> replica la señal instantáneamente a cada equipo</strong>, eliminando tiempos de aviso manual.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Grid actualizado a 3 columnas en desktop para que se vea más ordenado con 6 elementos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {features.map((feature) => (
-                        <div key={feature.name} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                            <div className="bg-blue-50 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                                <feature.icon className="h-10 w-10 text-blue-600" />
+                        <div 
+                            key={feature.name} 
+                            className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col items-start"
+                        >
+                            <div className="bg-blue-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                                <feature.icon className="h-8 w-8 text-blue-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.name}</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.name}</h3>
                             <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                         </div>
                     ))}
