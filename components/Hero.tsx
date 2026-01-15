@@ -38,7 +38,7 @@ export default function Hero() {
 
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Link
-                            href="https://app.alertsil.com/register"
+                            href="https://alertsil-admin-panel.vercel.app/register"
                             className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all transform hover:scale-105 shadow-xl shadow-blue-200 flex items-center justify-center gap-2"
                         >
                             Proteger mi empresa ahora

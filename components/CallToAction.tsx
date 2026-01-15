@@ -13,7 +13,7 @@ export default function CallToAction() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
-            href="#contact" 
+            href="https://alertsil-admin-panel.vercel.app/register" 
             className="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl"
           >
             Crear Cuenta Gratis
