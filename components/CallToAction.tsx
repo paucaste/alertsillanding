@@ -6,7 +6,7 @@ export default function CallToAction() {
     <section className="bg-blue-600 py-20 text-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
-          ¿Listo para optimizar tu monitoreo?
+          ¿Listo para proteger tu negocio?
         </h2>
         <p className="text-xl mb-10 opacity-90">
           Únete a AlertSil hoy mismo y toma el control total de tus dispositivos con alertas inteligentes.
