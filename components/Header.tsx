@@ -13,8 +13,8 @@ export default function Header() {
         
         <div className="flex items-center gap-4">
           <a
-            href="/alertsil/releases/AlertSil-1.0.2-setup.zip"
-            download="AlertSil-1.0.2-setup.zip"
+            href="https://github.com/paucaste/alertsillanding/releases/download/1.0.2/AlertSil-1.0.2-setup.exe"
+            download="AlertSil-1.0.2-setup.exe"
             rel="noopener noreferrer"
             className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
           >
