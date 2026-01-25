@@ -12,7 +12,12 @@ export default function Header() {
         </div>
         
         <div className="flex items-center gap-4">
-          <a href="/alertsil/releases/AlertSil-1.0.2-setup.zip" download className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+          <a
+            href="/alertsil/releases/AlertSil-1.0.2-setup.zip"
+            download="AlertSil-1.0.2-setup.zip"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+          >
             Descargar Gratis
           </a>
           <Link href="https://alertsil-admin-panel.vercel.app/" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
