@@ -6,6 +6,29 @@
     <description>Actualizaciones de AlertSil para Windows</description>
     <language>es</language>
 
+    <!-- Version 1.0.2 -->
+    <item>
+      <title>Version 1.0.2</title>
+      <description>
+        <![CDATA[
+          <h2>Novedades en 1.0.2</h2>
+          <ul>
+            <li>Correcciones de errores</li>
+            <li>Mejoras de rendimiento</li>
+          </ul>
+        ]]>
+      </description>
+      <pubDate>Sat, 25 Jan 2026 14:00:00 +0000</pubDate>
+      <enclosure
+        url="https://alertsil.com/alertsil/releases/AlertSil-1.0.2-setup.exe"
+        sparkle:version="1.0.2"
+        sparkle:shortVersionString="1.0.2"
+        sparkle:os="windows"
+        length="32325800"
+        type="application/octet-stream"
+      />
+    </item>
+
     <!-- Version 1.0.1 -->
     <item>
       <title>Version 1.0.1</title>
