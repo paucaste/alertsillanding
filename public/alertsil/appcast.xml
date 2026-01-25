@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>AlertSil</title>
+    <link>https://alertsil.com/alertsil/appcast.xml</link>
+    <description>Actualizaciones de AlertSil para Windows</description>
+    <language>es</language>
+
+    <!-- Version 1.0.1 -->
+    <item>
+      <title>Version 1.0.1</title>
+      <description>
+        <![CDATA[
+          <h2>Novedades en 1.0.1</h2>
+          <ul>
+            <li>Correcciones de errores</li>
+            <li>Mejoras de rendimiento</li>
+          </ul>
+        ]]>
+      </description>
+      <pubDate>Sat, 25 Jan 2026 12:00:00 +0000</pubDate>
+      <enclosure
+        url="https://alertsil.com/alertsil/releases/AlertSil-1.0.1-setup.exe"
+        sparkle:version="1.0.1"
+        sparkle:shortVersionString="1.0.1"
+        sparkle:os="windows"
+        length="31419072"
+        type="application/octet-stream"
+      />
+    </item>
+
+  </channel>
+</rss>
