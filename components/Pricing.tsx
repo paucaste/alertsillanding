@@ -5,7 +5,7 @@ const tiers = [
   {
     name: 'Starter',
     price: '8,99€',
-    description: 'Protección básica para autónomos, oficinas pequeñas y talleres.',
+    description: 'Protección básica para oficinas pequeñas.',
     features: [
       'Hasta 10 equipos conectados',
       'Alerta Global Instantánea',
@@ -19,11 +19,11 @@ const tiers = [
   {
     name: 'Business',
     price: '19,99€',
-    description: 'La opción ideal para PYMES, almacenes y centros logísticos.',
+    description: 'La opción ideal para PYMES.',
     features: [
       'Hasta 50 equipos conectados',
       'Alarmas Silenciosas',
-      'Historial de alertas (Logs)',
+      'Historial de alertas',
       'Ligereza total del sistema',
       'Soporte prioritario'
     ],
@@ -33,7 +33,7 @@ const tiers = [
   {
     name: 'Industrial',
     price: '49,99€',
-    description: 'Máxima capacidad para plantas de producción e infraestructuras.',
+    description: 'Máxima capacidad para grandes empresas.',
     features: [
       'Hasta 150 equipos conectados',
       'Panel de control avanzado',
