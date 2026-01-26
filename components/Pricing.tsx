@@ -4,8 +4,10 @@ import { CheckIcon } from '@heroicons/react/20/solid';
 const tiers = [
   {
     name: 'Starter',
-    price: '8,99€',
-    description: 'Protección básica para oficinas pequeñas.',
+    price: 8.99,
+    limit: 10,
+    description: 'Protección esencial. Solo 0,90€ por equipo.',
+    savings: null,
     features: [
       'Hasta 10 equipos conectados',
       'Alerta Global Instantánea',
@@ -18,8 +20,10 @@ const tiers = [
   },
   {
     name: 'Business',
-    price: '19,99€',
-    description: 'La opción ideal para PYMES.',
+    price: 19.99,
+    limit: 50,
+    description: 'Eficiencia para PYMES. Baja a 0,40€ por equipo.',
+    savings: 'Ahorras un 55%',
     features: [
       'Hasta 50 equipos conectados',
       'Alarmas Silenciosas',
@@ -32,8 +36,10 @@ const tiers = [
   },
   {
     name: 'Industrial',
-    price: '49,99€',
-    description: 'Máxima capacidad para grandes empresas.',
+    price: 49.99,
+    limit: 150,
+    description: 'Máximo ahorro corporativo. Solo 0,33€ por equipo.',
+    savings: 'Ahorras un 63%',
     features: [
       'Hasta 150 equipos conectados',
       'Panel de control avanzado',
@@ -50,18 +56,15 @@ export default function Pricing() {
   return (
     <section id="pricing" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Cabecera de la sección */}
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-5xl tracking-tight">
             Planes adaptados a tu equipo
           </h2>
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-            Seguridad laboral inteligente sin complicaciones técnicas. 
-            Elige el plan que mejor se adapte al tamaño de tu compañía.
+            Seguridad laboral inteligente. Cuantos más equipos protejas, menos pagas por cada uno.
           </p>
         </div>
 
-        {/* Contenedor de Tarjetas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {tiers.map((tier) => (
             <div 
@@ -78,18 +81,23 @@ export default function Pricing() {
                 </span>
               )}
 
+              {tier.savings && (
+                <span className="mb-4 inline-block w-fit bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-lg uppercase">
+                  {tier.savings}
+                </span>
+              )}
+
               <div className="mb-8">
                 <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide">{tier.name}</h3>
                 <div className="mt-4 flex items-baseline">
-                  <span className="text-5xl font-extrabold text-gray-900">{tier.price}</span>
+                  <span className="text-5xl font-extrabold text-gray-900">{tier.price.toString().replace('.', ',')}€</span>
                   <span className="ml-1 text-xl font-medium text-gray-500">/mes</span>
                 </div>
-                <p className="mt-4 text-gray-600 text-sm leading-relaxed">
+                <p className="mt-4 text-gray-600 text-sm font-medium leading-relaxed italic">
                   {tier.description}
                 </p>
               </div>
 
-              {/* Lista de Features */}
               <ul className="space-y-4 mb-10 flex-1">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3 text-sm text-gray-700">
@@ -99,7 +107,6 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              {/* Botón de Acción */}
               <button 
                 className={`w-full py-4 rounded-2xl font-bold transition-all transform active:scale-95 ${
                   tier.mostPopular 
@@ -113,16 +120,8 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* Pie de precios */}
         <div className="mt-16 text-center space-y-4">
-          <div className="flex flex-wrap justify-center gap-6 text-gray-400 text-xs font-medium uppercase tracking-widest">
-            <span>Sin permanencia</span>
-            <span>•</span>
-            <span>Activación inmediata</span>
-            <span>•</span>
-            <span>Soporte en España</span>
-          </div>
-          <p className="mt-8 text-gray-900 font-semibold">
+          <p className="text-gray-900 font-semibold">
             ¿Más de 150 equipos? <span className="text-blue-600 underline cursor-pointer decoration-2 underline-offset-4">Hablemos de un plan a medida</span>
           </p>
         </div>
