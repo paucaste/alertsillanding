@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Lottie from 'lottie-react';
 import connectAnimation from '../public/connect.json';
+import AlertCard from './AlertCard';
 
 export default function Hero() {
     return (
@@ -33,7 +34,7 @@ export default function Hero() {
                     </h1>
 
                     <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
-                        Nuestra tecnología permite disparar una alerta crítica a <strong>todos los equipos de tu compañía simultáneamente</strong>. En situaciones de riesgo, cada segundo cuenta para garantizar la seguridad de tus trabajadores.
+                        Nuestra tecnología permite disparar una alerta crítica a <strong>todos los equipos de tu compañía simultáneamente</strong>. En situaciones de riesgo, cada segundo cuenta para garantizar la seguridad de los profesionales.
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -50,6 +51,8 @@ export default function Hero() {
                             Cómo funciona
                         </Link>
                     </div>
+
+                   
 
                     {/* Estadísticas */}
                     {/* <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-gray-100 pt-12 max-w-4xl mx-auto">
