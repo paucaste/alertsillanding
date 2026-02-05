@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import Lottie from 'lottie-react';
 import connectAnimation from '../public/connect.json';
-import AlertCard from './AlertCard';
 
 export default function Hero() {
     return (
