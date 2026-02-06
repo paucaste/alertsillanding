@@ -51,8 +51,7 @@ export default function Features() {
                         Comunicación crítica en cadena: de uno a todos
                     </h2>
                     <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                        Nuestro software centraliza la seguridad en un solo panel. Al activar la alerta, el sistema 
-                        <strong> replica la señal instantáneamente a cada equipo</strong>, eliminando tiempos de aviso manual.
+                        Reducimos el tiempo de respuesta ante agresiones, emergencias médicas o incidentes de seguridad de minutos a segundos, <strong>asegurando que ningún empleado esté solo en una situación de riesgo.</strong>
                     </p>
                 </div>
 
