@@ -3,7 +3,8 @@ import {
     ShieldExclamationIcon,
     SignalIcon,
     UserGroupIcon,
-    SpeakerXMarkIcon, // Mejor para alarmas silenciosas
+    SpeakerWaveIcon,
+    SpeakerXMarkIcon,
     ClockIcon,
     CloudArrowDownIcon,
     CpuChipIcon
@@ -16,9 +17,19 @@ const features = [
         icon: ShieldExclamationIcon,
     },
     {
+        name: 'Alarmas con Sonido',
+        description: 'Emite una alarma sonora en todos los equipos configurados, garantizando que cada miembro del equipo reciba el aviso al instante.',
+        icon: SpeakerWaveIcon,
+    },
+    {
         name: 'Alarmas Silenciosas',
         description: 'Notifica discretamente a seguridad sin alertar a intrusos ni causar pánico innecesario.',
         icon: SpeakerXMarkIcon,
+    },
+    {
+        name: 'Conectividad Crítica',
+        description: 'Monitoreo constante del estado de los equipos para asegurar una red siempre lista.',
+        icon: SignalIcon,
     },
     {
         name: 'Instalación en 30s',
@@ -34,11 +45,6 @@ const features = [
         name: 'Ligereza Total',
         description: 'Optimizado para no consumir recursos. Tu equipo seguirá volando mientras está protegido.',
         icon: CpuChipIcon,
-    },
-    {
-        name: 'Conectividad Crítica',
-        description: 'Monitoreo constante del estado de los equipos para asegurar una red siempre lista.',
-        icon: SignalIcon,
     },
 ];
 
