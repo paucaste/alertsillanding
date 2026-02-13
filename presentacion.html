@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlertSil - Sistema de Alertas Sanitarias</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 1. CONFIGURACIÓN BASE Y ESTILOS GLOBALES */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f1f5f9;
+            display: grid;
+            gap: 40px;
+            grid-template-columns: 1fr;
+            margin: 0;
+            min-height: 100vh;
+            place-items: center;
+            padding: 40px 0;
+        }
+
+        /* Contenedor de Diapositiva (Relación 16:9) */
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            background-color: #ffffff;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 60px;
+            font-family: 'Lato', sans-serif;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        /* Elementos decorativos de fondo */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            right: -150px;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(14, 165, 233, 0) 100%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .slide-container > * { position: relative; z-index: 1; }
+
+        /* TIPOGRAFÍA */
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+            border-left: 6px solid #0ea5e9;
+            padding-left: 20px;
+        }
+
+        p, li { font-size: 20px; color: #475569; line-height: 1.5; }
+
+        /* LAYOUTS DE CONTENIDO */
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .tiled-content {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+        }
+
+        .tile {
+            flex: 1;
+            background-color: #f8fafc;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .tile .icon { margin-bottom: 20px; }
+        .tile .icon svg { width: 44px; height: 44px; }
+        .tile h3 { font-size: 24px; margin-bottom: 12px; }
+        .tile p { font-size: 17px; }
+
+        /* Tablas */
+        .table-layout table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-layout th {
+            background-color: #0ea5e9;
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            font-family: 'Poppins';
+        }
+        .table-layout td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Línea de Tiempo */
+        .timeline-layout {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            width: 100%;
+            margin-top: 50px;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+        .timeline-item { width: 18%; background: white; z-index: 1; text-align: center; }
+        .timeline-dot {
+            width: 24px;
+            height: 24px;
+            background: #0ea5e9;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 0 0 4px #e2e8f0;
+        }
+
+        /* Gráficos de barra manuales */
+        .chart-container { width: 100%; }
+        .bar { display: flex; align-items: center; gap: 20px; margin-bottom: 15px; }
+        .bar-label { width: 220px; text-align: right; font-weight: 600; }
+        .bar-track { flex-grow: 1; height: 40px; background: #f1f5f9; border-radius: 20px; overflow: hidden; }
+        .bar-fill { height: 100%; background: #0ea5e9; display: flex; align-items: center; padding-left: 15px; color: white; font-weight: 700; font-size: 16px; }
+
+        /* Imágenes / Ilustraciones */
+        .image-wrapper { width: 100%; height: 350px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; background: #f8fafc; }
+        .image-wrapper svg { width: 100%; height: 100%; }
+
+        /* Estilos de Portada */
+        .title-layout { text-align: center; }
+        .title-layout h1 { font-size: 60px; margin-bottom: 15px; }
+        .title-layout .subtitle { font-size: 28px; color: #0ea5e9; font-weight: 600; margin-bottom: 40px; }
+
+        /* Layout con imagen lateral "Bleed" */
+        .bleed-image-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 !important; align-items: start; }
+        .bleed-text-side { padding: 60px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bleed-image-side { width: 100%; height: 720px; }
+
+        .highlight-blue { color: #0ea5e9; font-weight: 700; }
+
+        /* Iconos inline (check circles en listas) */
+        .icon-check-inline { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin-right: 12px; }
+
+        /* ESTILOS DE IMPRESIÓN / PDF */
+        @media print {
+            @page {
+                size: 339mm 191mm;
+                margin: 0;
+            }
+            body {
+                background: white;
+                padding: 0;
+                gap: 0;
+                display: block;
+            }
+            .slide-container {
+                box-shadow: none;
+                border-radius: 0;
+                page-break-after: always;
+                page-break-inside: avoid;
+                margin: 0;
+            }
+            .slide-container:last-child {
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- DIAPOSITIVA 1: EXPOSICIÓN DEL PROBLEMA -->
+<div class="slide-container" id="slide1">
+    <h2 class="slide-title">Cuando ocurre una emergencia</h2>
+    <div class="content-area">
+        <p style="font-size: 24px; margin-bottom: 35px;">En muchas organizaciones:</p>
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L1 21h22L12 2z" fill="#0ea5e9" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+                        <path d="M12 9v5" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="17" r="1" fill="#0ea5e9"/>
+                    </svg>
+                </div>
+                <h3>Sin aviso inmediato</h3>
+                <p>No hay un sistema de aviso inmediato para alertar al equipo en tiempo real.</p>
+            </div>
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8V6a6 6 0 00-12 0v2" stroke="#0ea5e9" stroke-width="0" fill="none"/>
+                        <path d="M3 14l9-8 9 8" fill="#0ea5e9" opacity="0.15"/>
+                        <path d="M4 15V9l8-6 8 6v6" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <path d="M20 12l2 1.5" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M20 9l3 2" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M20 15l1.5 1" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round"/>
+                        <rect x="8" y="15" width="8" height="6" rx="1" fill="#0ea5e9" opacity="0.3"/>
+                        <path d="M4 15h16v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5z" stroke="#0ea5e9" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
+                <h3>Avisos precarios</h3>
+                <p>Los avisos dependen de llamadas o gritos, métodos lentos e ineficaces.</p>
+            </div>
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1.5"/>
+                        <circle cx="12" cy="12" r="3.5" stroke="#0ea5e9" stroke-width="1.5" fill="#0ea5e9" opacity="0.2"/>
+                        <line x1="4" y1="20" x2="20" y2="4" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>Sin discreción</h3>
+                <p>No se puede pedir ayuda de forma discreta en situaciones sensibles.</p>
+            </div>
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="#0ea5e9" opacity="0.12" stroke="#0ea5e9" stroke-width="1.5"/>
+                        <path d="M9 9.5a3 3 0 015.12 2.12c-.58.6-1.62 1.38-1.62 2.38V15" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="12.5" cy="18" r="1" fill="#0ea5e9"/>
+                    </svg>
+                </div>
+                <h3>Sin confirmación</h3>
+                <p>No se sabe quién ha visto la alerta ni quién va a acudir.</p>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 40px; font-weight: 700; font-size: 24px; color: #0f172a;">La falta de coordinación puede <span class="highlight-blue">empeorar</span> una emergencia.</p>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 2: LA SOLUCIÓN ALERTSIL -->
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">La Solución: AlertSil</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <p><b>AlertSil</b> es una aplicación de escritorio que convierte los ordenadores de cualquier organización en una <span class="highlight-blue">red de alertas en tiempo real</span>.</p>
+                <p style="margin-top: 20px;">Con un solo click, cualquier empleado puede enviar una alerta que aparece instantáneamente en todos los equipos conectados. Los receptores confirman que la han visto y pueden indicar que acuden a ayudar.</p>
+                <ul style="margin-top: 25px; list-style: none; padding: 0;">
+                    <li style="margin-bottom: 15px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Sin hardware adicional:</b> Solo se necesitan los ordenadores que ya tiene.</li>
+                    <li style="margin-bottom: 15px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Multiplataforma:</b> Compatible con Windows, Mac y Linux.</li>
+                    <li style="margin-bottom: 15px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Alertas configurables:</b> Sonoras, visuales o silenciosas según la situación.</li>
+                    <li><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Trazabilidad completa:</b> Registro de quién envía, quién ve y quién responde.</li>
+                </ul>
+            </div>
+            <div class="image-wrapper">
+                <!-- Ilustración: Red de ordenadores con alerta -->
+                <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:0.08"/>
+                            <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0.02"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="500" height="350" fill="#f8fafc"/>
+                    <circle cx="250" cy="175" r="130" fill="url(#grad1)" stroke="#0ea5e9" stroke-width="1" stroke-dasharray="6,4" opacity="0.5"/>
+                    <!-- Monitor central -->
+                    <rect x="195" y="110" width="110" height="80" rx="6" fill="white" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="200" y="115" width="100" height="60" rx="3" fill="#0ea5e9" opacity="0.12"/>
+                    <rect x="235" y="190" width="30" height="12" rx="2" fill="#cbd5e1"/>
+                    <rect x="220" y="200" width="60" height="5" rx="2" fill="#cbd5e1"/>
+                    <!-- Alerta en pantalla central -->
+                    <rect x="218" y="125" width="64" height="40" rx="6" fill="#0ea5e9" opacity="0.9"/>
+                    <path d="M250 132l-8 14h16l-8-14z" fill="white"/>
+                    <rect x="248" y="150" width="4" height="4" rx="2" fill="white"/>
+                    <!-- Monitor superior izquierdo -->
+                    <rect x="70" y="50" width="80" height="58" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+                    <rect x="74" y="54" width="72" height="40" rx="2" fill="#0ea5e9" opacity="0.08"/>
+                    <rect x="98" y="108" width="24" height="8" rx="2" fill="#e2e8f0"/>
+                    <circle cx="110" cy="70" r="8" fill="#0ea5e9" opacity="0.3"/>
+                    <path d="M110 66l-4 7h8l-4-7z" fill="#0ea5e9"/>
+                    <!-- Monitor superior derecho -->
+                    <rect x="350" y="50" width="80" height="58" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+                    <rect x="354" y="54" width="72" height="40" rx="2" fill="#0ea5e9" opacity="0.08"/>
+                    <rect x="378" y="108" width="24" height="8" rx="2" fill="#e2e8f0"/>
+                    <circle cx="390" cy="70" r="8" fill="#0ea5e9" opacity="0.3"/>
+                    <path d="M390 66l-4 7h8l-4-7z" fill="#0ea5e9"/>
+                    <!-- Monitor inferior izquierdo -->
+                    <rect x="85" y="230" width="80" height="58" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+                    <rect x="89" y="234" width="72" height="40" rx="2" fill="#0ea5e9" opacity="0.08"/>
+                    <rect x="113" y="288" width="24" height="8" rx="2" fill="#e2e8f0"/>
+                    <circle cx="125" cy="250" r="8" fill="#0ea5e9" opacity="0.3"/>
+                    <path d="M125 246l-4 7h8l-4-7z" fill="#0ea5e9"/>
+                    <!-- Monitor inferior derecho -->
+                    <rect x="335" y="230" width="80" height="58" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+                    <rect x="339" y="234" width="72" height="40" rx="2" fill="#0ea5e9" opacity="0.08"/>
+                    <rect x="363" y="288" width="24" height="8" rx="2" fill="#e2e8f0"/>
+                    <circle cx="375" cy="250" r="8" fill="#0ea5e9" opacity="0.3"/>
+                    <path d="M375 246l-4 7h8l-4-7z" fill="#0ea5e9"/>
+                    <!-- Líneas de conexión -->
+                    <line x1="150" y1="80" x2="195" y2="140" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+                    <line x1="350" y1="80" x2="305" y2="140" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+                    <line x1="165" y1="255" x2="210" y2="185" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+                    <line x1="335" y1="255" x2="290" y2="185" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+                    <!-- Ondas de señal -->
+                    <circle cx="250" cy="145" r="70" fill="none" stroke="#0ea5e9" stroke-width="0.8" opacity="0.2"/>
+                    <circle cx="250" cy="145" r="95" fill="none" stroke="#0ea5e9" stroke-width="0.6" opacity="0.12"/>
+                    <!-- Etiqueta -->
+                    <text x="250" y="330" text-anchor="middle" font-family="Poppins, sans-serif" font-size="13" fill="#94a3b8" font-weight="600">Red de alertas en tiempo real</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 3: FUNCIONALIDADES CLAVE -->
+<div class="slide-container" id="slide3">
+    <h2 class="slide-title">Alertas en un Solo Click</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 2L4 14h8l-1 8 10-12h-8l0-8z" fill="#0ea5e9" opacity="0.2" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>Milisegundos</h3>
+                <p>La tecnología de comunicación bidireccional garantiza que la alerta se reciba al instante en todo el centro.</p>
+            </div>
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="8" cy="7" r="3.5" fill="#0ea5e9" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5"/>
+                        <circle cx="16" cy="7" r="3.5" fill="#0ea5e9" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5"/>
+                        <path d="M1 21v-2a5 5 0 015-5h2" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M23 21v-2a5 5 0 00-5-5h-2" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 17l4 4 4-4" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#0ea5e9" opacity="0.15"/>
+                    </svg>
+                </div>
+                <h3>Saber quién acude</h3>
+                <p>El emisor ve en tiempo real quién ha pulsado "en camino", reduciendo la ansiedad y el caos.</p>
+            </div>
+            <div class="tile">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="3" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1.5"/>
+                        <path d="M8 12l2.5 2.5L16 9" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>Gestión Inteligente</h3>
+                <p>Auto-resolución de alertas cuando el equipo responde o cierre manual por parte del emisor.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 4: FLUJO DE USO -->
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">Ciclo de una Alerta Eficiente</h2>
+    <div class="content-area">
+        <div class="timeline-layout">
+            <div class="timeline-line"></div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Activación</h3>
+                <p style="font-size: 14px;">El profesional pulsa el botón en pantalla.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Difusión</h3>
+                <p style="font-size: 14px;">El aviso aparece en el resto de PCs del centro.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Compromiso</h3>
+                <p style="font-size: 14px;">Los compañeros confirman asistencia.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Resolución</h3>
+                <p style="font-size: 14px;">El evento se cierra tras la ayuda.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Registro</h3>
+                <p style="font-size: 14px;">Registro de logs para análisis posterior.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 5: CONFIGURACIÓN POR TIPO -->
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">Tipos de Alerta Personalizables</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Objetivo Operativo</th>
+                        <th>Señal de Alerta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>EMERGENCIA CRÍTICA</b></td>
+                        <td>Parada cardíaca o crisis grave</td>
+                        <td>Visual y Sonora (Prioridad Alta)</td>
+                    </tr>
+                    <tr>
+                        <td><b>ALERTA DE SEGURIDAD</b></td>
+                        <td>Agresión o tensión en sala</td>
+                        <td>Solo Visual (Modo Silencioso)</td>
+                    </tr>
+                    <tr>
+                        <td><b>PETICIÓN DE APOYO</b></td>
+                        <td>Ayuda técnica en consulta</td>
+                        <td>Visual y Sonora (Prioridad Media)</td>
+                    </tr>
+                    <tr>
+                        <td><b>NOTIFICACIÓN GENERAL</b></td>
+                        <td>Avisos administrativos</td>
+                        <td>Solo Pop-up (Baja)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 6: CASO PRÁCTICO: DISCRECIÓN -->
+<div class="slide-container bleed-image-layout" id="slide6">
+    <div class="bleed-text-side">
+        <h2 class="slide-title">Caso: Alerta Silenciosa</h2>
+        <div class="content-area">
+            <p>Un paciente en recepción se muestra hostil y agresivo. El personal no quiere empeorar la situación pidiendo ayuda a gritos.</p>
+            <p style="margin-top: 15px;">Mediante una tecla del teclado, recepción activa la <b>Alerta de Seguridad</b>.</p>
+            <p style="margin-top: 15px;">Sin emitir sonido en recepción, los PCs de administración y seguridad muestran el aviso. El equipo acude de forma calmada y coordinada.</p>
+            <p style="margin-top: 15px; font-weight: 700;">Seguridad para el personal sin alertar al agresor.</p>
+        </div>
+    </div>
+    <div class="image-container">
+        <!-- Ilustración: Escena de recepción con alerta silenciosa -->
+        <svg class="bleed-image-side" viewBox="0 0 640 720" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:1"/>
+                    <stop offset="100%" style="stop-color:#f0f9ff;stop-opacity:1"/>
+                </linearGradient>
+            </defs>
+            <rect width="640" height="720" fill="url(#grad2)"/>
+            <!-- Decorative circles -->
+            <circle cx="500" cy="100" r="180" fill="#0ea5e9" opacity="0.04"/>
+            <circle cx="150" cy="600" r="200" fill="#0ea5e9" opacity="0.04"/>
+            <!-- Mostrador recepción -->
+            <rect x="60" y="400" width="520" height="120" rx="10" fill="#0f172a" opacity="0.08"/>
+            <rect x="60" y="395" width="520" height="20" rx="5" fill="#0ea5e9" opacity="0.3"/>
+            <!-- Monitor en mostrador -->
+            <rect x="240" y="300" width="160" height="100" rx="8" fill="white" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="248" y="308" width="144" height="72" rx="4" fill="#f1f5f9"/>
+            <rect x="300" y="400" width="40" height="15" rx="3" fill="#cbd5e1"/>
+            <!-- Alerta silenciosa en pantalla -->
+            <rect x="268" y="318" width="104" height="52" rx="8" fill="#0ea5e9" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5"/>
+            <rect x="288" y="328" width="64" height="6" rx="3" fill="#0ea5e9" opacity="0.5"/>
+            <rect x="298" y="340" width="44" height="6" rx="3" fill="#0ea5e9" opacity="0.3"/>
+            <circle cx="320" cy="358" r="5" fill="#0ea5e9" opacity="0.6"/>
+            <!-- Escudo de seguridad central -->
+            <g transform="translate(260, 150)">
+                <path d="M60 10 L110 30 L110 75 C110 110 60 140 60 140 C60 140 10 110 10 75 L10 30 Z" fill="#0ea5e9" opacity="0.12" stroke="#0ea5e9" stroke-width="2"/>
+                <path d="M45 80 L55 90 L78 62" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </g>
+            <!-- Persona en recepción (silueta) -->
+            <circle cx="150" cy="310" r="25" fill="#0f172a" opacity="0.12"/>
+            <path d="M120 390 Q150 350 180 390" fill="#0f172a" opacity="0.08"/>
+            <!-- Persona de seguridad (silueta) -->
+            <circle cx="490" cy="310" r="25" fill="#0ea5e9" opacity="0.2"/>
+            <path d="M460 390 Q490 350 520 390" fill="#0ea5e9" opacity="0.12"/>
+            <!-- Flecha silenciosa -->
+            <path d="M200 330 C250 280 390 280 460 330" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="8,5" opacity="0.4"/>
+            <polygon points="455,322 465,332 452,335" fill="#0ea5e9" opacity="0.5"/>
+            <!-- Icono silencio -->
+            <g transform="translate(290, 255)">
+                <circle cx="20" cy="18" r="18" fill="white" stroke="#0ea5e9" stroke-width="1.5" opacity="0.9"/>
+                <rect x="14" y="10" width="5" height="10" rx="2" fill="#0ea5e9" opacity="0.6"/>
+                <path d="M19 10 L28 4 L28 30 L19 24 Z" fill="#0ea5e9" opacity="0.5"/>
+                <line x1="10" y1="26" x2="32" y2="8" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <!-- Texto inferior -->
+            <text x="320" y="570" text-anchor="middle" font-family="Poppins, sans-serif" font-size="16" fill="#0ea5e9" font-weight="600" opacity="0.6">Alerta silenciosa activada</text>
+            <text x="320" y="595" text-anchor="middle" font-family="Lato, sans-serif" font-size="13" fill="#94a3b8">Sin sonido. Sin pánico. Con respuesta.</text>
+        </svg>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 7: RESUMEN DE BENEFICIOS -->
+<div class="slide-container" id="slide8">
+    <h2 class="slide-title">Por qué elegir AlertSil</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 20px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Tranquilidad Mental:</b> El doctor nunca está solo.</li>
+                <li style="margin-bottom: 20px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Discreción Total:</b> Alertas silenciosas contra agresiones.</li>
+                <li style="margin-bottom: 20px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Cero Inversión en Hardware:</b> Instalación rápida.</li>
+                <li style="margin-bottom: 20px;"><svg class="icon-check-inline" viewBox="0 0 20 20" fill="#0ea5e9"><path d="M10 0a10 10 0 110 20 10 10 0 010-20zm4.3 7.3a1 1 0 00-1.4-1.4L9 9.8 7.1 7.9a1 1 0 00-1.4 1.4l2.5 2.5a1 1 0 001.4 0l4.7-4.5z"/></svg> <b>Auditoría Completa:</b> Mejore su calidad asistencial.</li>
+            </ul>
+            <div class="image-wrapper">
+                <!-- Ilustración: Equipo coordinado -->
+                <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="500" height="350" fill="#f8fafc"/>
+                    <circle cx="250" cy="175" r="120" fill="#0ea5e9" opacity="0.04"/>
+                    <!-- Persona central -->
+                    <circle cx="250" cy="120" r="28" fill="#0ea5e9" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5"/>
+                    <circle cx="250" cy="112" r="12" fill="#0ea5e9" opacity="0.3"/>
+                    <path d="M230 140 Q250 160 270 140" fill="#0ea5e9" opacity="0.15"/>
+                    <!-- Persona izquierda -->
+                    <circle cx="120" cy="200" r="24" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1"/>
+                    <circle cx="120" cy="193" r="10" fill="#0ea5e9" opacity="0.2"/>
+                    <path d="M103 218 Q120 235 137 218" fill="#0ea5e9" opacity="0.1"/>
+                    <!-- Persona derecha -->
+                    <circle cx="380" cy="200" r="24" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1"/>
+                    <circle cx="380" cy="193" r="10" fill="#0ea5e9" opacity="0.2"/>
+                    <path d="M363 218 Q380 235 397 218" fill="#0ea5e9" opacity="0.1"/>
+                    <!-- Persona abajo izq -->
+                    <circle cx="170" cy="280" r="22" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1"/>
+                    <circle cx="170" cy="273" r="9" fill="#0ea5e9" opacity="0.2"/>
+                    <!-- Persona abajo der -->
+                    <circle cx="330" cy="280" r="22" fill="#0ea5e9" opacity="0.1" stroke="#0ea5e9" stroke-width="1"/>
+                    <circle cx="330" cy="273" r="9" fill="#0ea5e9" opacity="0.2"/>
+                    <!-- Líneas de conexión -->
+                    <line x1="235" y1="145" x2="140" y2="185" stroke="#0ea5e9" stroke-width="1.5" opacity="0.3"/>
+                    <line x1="265" y1="145" x2="360" y2="185" stroke="#0ea5e9" stroke-width="1.5" opacity="0.3"/>
+                    <line x1="140" y1="220" x2="175" y2="260" stroke="#0ea5e9" stroke-width="1.5" opacity="0.3"/>
+                    <line x1="360" y1="220" x2="325" y2="260" stroke="#0ea5e9" stroke-width="1.5" opacity="0.3"/>
+                    <line x1="195" y1="280" x2="305" y2="280" stroke="#0ea5e9" stroke-width="1.5" opacity="0.2"/>
+                    <!-- Checkmarks sobre cada persona -->
+                    <g transform="translate(238, 90)">
+                        <circle cx="12" cy="12" r="10" fill="#0ea5e9"/>
+                        <path d="M8 12l3 3 5-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </g>
+                    <g transform="translate(108, 173)">
+                        <circle cx="10" cy="10" r="8" fill="#22c55e"/>
+                        <path d="M7 10l2 2 4-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </g>
+                    <g transform="translate(368, 173)">
+                        <circle cx="10" cy="10" r="8" fill="#22c55e"/>
+                        <path d="M7 10l2 2 4-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </g>
+                    <!-- Etiqueta -->
+                    <text x="250" y="335" text-anchor="middle" font-family="Poppins, sans-serif" font-size="13" fill="#94a3b8" font-weight="600">Equipo conectado y coordinado</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DIAPOSITIVA 8: CIERRE -->
+<div class="slide-container" id="slide9">
+    <div class="title-layout">
+        <h2 style="font-size: 85px; color: #0ea5e9;">AlertSil</h2>
+        <p class="subtitle" style="font-size: 32px;">Seguridad, velocidad y coordinación sanitaria.</p>
+        <div style="margin-top: 80px; border-top: 1px solid #e2e8f0; padding-top: 40px;">
+            <p style="font-size: 24px; font-weight: 700;">www.alertsil.com | alertsil@effizy.es</p>
+            <p style="margin-top: 15px; color: #64748b;">Protegiendo a quienes cuidan de nosotros.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

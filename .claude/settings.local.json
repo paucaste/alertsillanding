@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(\"C:\\\\Program Files \\(x86\\)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\" --headless --disable-gpu --print-to-pdf=\"C:\\\\Apache24\\\\htdocs\\\\alertsillanding\\\\presentacion.pdf\" --no-margins --print-to-pdf-no-header \"file:///C:/Apache24/htdocs/alertsillanding/presentacion.html\")",
+      "Bash(\"C:\\\\Program Files \\(x86\\)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\" --headless --disable-gpu --print-to-pdf=\"C:\\\\Apache24\\\\htdocs\\\\alertsillanding\\\\presentacion_v2.pdf\" --no-margins --print-to-pdf-no-header \"file:///C:/Apache24/htdocs/alertsillanding/presentacion.html\")"
     ]
   }
 }
