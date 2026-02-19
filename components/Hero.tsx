@@ -24,16 +24,16 @@ export default function Hero() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                         </span>
-                        Seguridad Laboral Inteligente
+                        Seguridad laboral para clínicas y empresas
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.1]">
-                        Protección instantánea con <br />
-                        <span className="text-blue-600">un solo clic</span>
+                        Cuando hay una emergencia, <br />
+                        <span className="text-blue-600">cada segundo cuenta</span>
                     </h1>
 
                     <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
-                        Nuestra tecnología permite disparar una alerta crítica a <strong>todos los equipos de tu compañía simultáneamente</strong>. En situaciones de riesgo, cada segundo cuenta para garantizar la seguridad de los profesionales.
+                        AlertSil conecta a todo tu equipo en un clic. Un empleado detecta un riesgo, pulsa el botón, y <strong>todos los dispositivos de la empresa reciben la alerta al instante</strong>. Sin apps, sin formación, sin retrasos.
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -41,33 +41,33 @@ export default function Hero() {
                             href="https://alertsil-admin-panel.vercel.app/register"
                             className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all transform hover:scale-105 shadow-xl shadow-blue-200 flex items-center justify-center gap-2"
                         >
-                            Proteger mi empresa ahora
+                            Probar gratis
                         </Link>
                         <Link
-                            href="#features"
+                            href="#demo"
                             className="bg-gray-50 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all border border-gray-200"
                         >
-                            Cómo funciona
+                            Ver cómo funciona
                         </Link>
                     </div>
 
                    
 
                     {/* Estadísticas */}
-                    {/* <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-gray-100 pt-12 max-w-4xl mx-auto">
+                    <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-gray-100 pt-12 max-w-4xl mx-auto">
                         <div>
-                            <p className="text-3xl font-bold text-gray-900">0.5s</p>
-                            <p className="text-sm text-gray-500 uppercase tracking-wider">Latencia de Alerta</p>
+                            <p className="text-3xl font-bold text-gray-900">&lt; 1s</p>
+                            <p className="text-sm text-gray-500 uppercase tracking-wider">Tiempo de propagación</p>
                         </div>
                         <div>
-                            <p className="text-3xl font-bold text-gray-900">100%</p>
-                            <p className="text-sm text-gray-500 uppercase tracking-wider">Equipos Conectados</p>
+                            <p className="text-3xl font-bold text-gray-900">0 formación</p>
+                            <p className="text-sm text-gray-500 uppercase tracking-wider">Instalación inmediata</p>
                         </div>
                         <div>
                             <p className="text-3xl font-bold text-gray-900">24/7</p>
-                            <p className="text-sm text-gray-500 uppercase tracking-wider">Monitoreo Activo</p>
+                            <p className="text-sm text-gray-500 uppercase tracking-wider">Protección activa</p>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </div>
 
