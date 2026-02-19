@@ -20,9 +20,9 @@ export default function ContactForm() {
     <section id="contact" className="py-24 bg-white">
       <div className="max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900">Empezemos!</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Solicita una demo personalizada</h2>
           <p className="mt-4 text-gray-600">
-            Déjanos tus datos y te contactaremos.
+            Déjanos tus datos y te mostraremos cómo AlertSil puede proteger a tu equipo en menos de 5 minutos.
           </p>
         </div>
 

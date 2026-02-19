@@ -22,6 +22,8 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-4">Producto</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="#features" className="hover:text-blue-400 transition-colors">Características</Link></li>
+              <li><Link href="#pricing" className="hover:text-blue-400 transition-colors">Precios</Link></li>
+              <li><Link href="#contact" className="hover:text-blue-400 transition-colors">Contacto</Link></li>
               <li><Link href="https://alertsil-admin-panel.vercel.app" className="hover:text-blue-400 transition-colors">Panel de Control</Link></li>
             </ul>
           </div>

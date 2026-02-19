@@ -54,7 +54,7 @@ export default function Features() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                        Comunicación crítica en cadena: de uno a todos
+                        Todo lo que necesitas para proteger a tu equipo
                     </h2>
                     <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
                         Reducimos el tiempo de respuesta ante agresiones, emergencias médicas o incidentes de seguridad de minutos a segundos, <strong>asegurando que ningún empleado esté solo en una situación de riesgo.</strong>

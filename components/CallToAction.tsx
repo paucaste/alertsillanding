@@ -16,7 +16,7 @@ export default function CallToAction() {
             href="https://alertsil-admin-panel.vercel.app/register" 
             className="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl"
           >
-            Crear Cuenta Gratis
+            Probar gratis
           </Link>
           <Link 
             href="mailto:info@effizy.es" 

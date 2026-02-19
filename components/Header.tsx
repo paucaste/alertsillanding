@@ -30,7 +30,7 @@ export default function Header() {
             Entrar
           </Link>
           <Link href="https://alertsil-admin-panel.vercel.app/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md shadow-blue-100">
-            Empezar Gratis
+            Probar gratis
           </Link>
         </div>
 
@@ -66,7 +66,7 @@ export default function Header() {
               Entrar
             </Link>
             <Link href="https://alertsil-admin-panel.vercel.app/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md shadow-blue-100 text-center">
-              Empezar Gratis
+              Probar gratis
             </Link>
           </div>
         </div>
