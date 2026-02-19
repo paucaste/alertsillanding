@@ -1,337 +1,479 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const CYCLE = 14;
+// ── Types ──────────────────────────────────────────────────────────────────────
 
 type Response = 'en_camino' | 'recibido';
 
-const topRooms = [
-    { label: 'Consulta 1', doctor: 'Dra. María López', isSource: true, response: undefined as Response | undefined },
-    { label: 'Consulta 2', doctor: 'Dr. Andrés Ruiz', isSource: false, response: 'en_camino' as Response },
-    { label: 'Consulta 3', doctor: 'Dra. Elena Navarro', isSource: false, response: 'recibido' as Response },
-];
-
-const bottomRooms = [
-    { label: 'Recepción', doctor: 'Laura Díaz', isSource: false, response: 'recibido' as Response },
-    { label: 'Consulta 4', doctor: 'Dr. Carlos Méndez', isSource: false, response: 'en_camino' as Response },
-    { label: 'Seguridad', doctor: 'José Martínez', isSource: false, response: 'en_camino' as Response },
-];
-
-const enCaminoRooms = [...topRooms, ...bottomRooms]
-    .filter((r) => r.response === 'en_camino')
-    .map((r) => ({ label: r.label, doctor: r.doctor }));
-
-// Delays en segundos
-const ALERT_DELAY = (col: number) => 1.4 + col * 0.5;
-const RESPONSE_DELAY = (col: number) => 5.5 + col * 0.3;
-const SOURCE_RECEIVE = 6.8;
-
-function RoomCard({
-    label,
-    doctor,
-    isSource,
-    col,
-    response,
-}: {
+interface RoomData {
     label: string;
-    doctor: string;
+    person: string;
     isSource: boolean;
-    col: number;
-    response?: Response;
+    response: Response | undefined;
+}
+
+// ── Room data ──────────────────────────────────────────────────────────────────
+
+const topRooms: RoomData[] = [
+    { label: 'Consulta 1', person: 'Dra. María López', isSource: true, response: undefined },
+    { label: 'Consulta 2', person: 'Dr. Andrés Ruiz', isSource: false, response: 'en_camino' },
+    { label: 'Consulta 3', person: 'Dra. Elena Navarro', isSource: false, response: 'recibido' },
+];
+
+const bottomRooms: RoomData[] = [
+    { label: 'Recepción', person: 'Laura Díaz', isSource: false, response: 'recibido' },
+    { label: 'Consulta 4', person: 'Dr. Carlos Méndez', isSource: false, response: 'en_camino' },
+    { label: 'Seguridad', person: 'José Martínez', isSource: false, response: 'en_camino' },
+];
+
+const enCaminoCount = [...topRooms, ...bottomRooms].filter(
+    (r) => r.response === 'en_camino'
+).length;
+
+// ── Animation timing (seconds) ─────────────────────────────────────────────────
+
+const LOOP_DURATION = 11;
+
+const TIMING = {
+    alertFlash: 0.8,
+    lineToHallway: 1.2,
+    lineBranch: 1.8,
+    lineToRoomsStart: 2.0,
+    lineToRoomsEnd: 3.5,
+    roomHighlightStart: 2.0,
+    responseBadgesStart: 4.5,
+    sourceBadge: 6.5,
+} as const;
+
+// Per-room line arrival delays (staggered from 2.0 to 3.5)
+const roomLineDelay = (index: number, total: number) =>
+    TIMING.lineToRoomsStart +
+    (index / Math.max(total - 1, 1)) * (TIMING.lineToRoomsEnd - TIMING.lineToRoomsStart);
+
+// Per-room response badge delays (staggered from 4.5 to 6.5)
+const responseBadgeDelay = (index: number, total: number) =>
+    TIMING.responseBadgesStart +
+    (index / Math.max(total - 1, 1)) * (TIMING.sourceBadge - TIMING.responseBadgesStart);
+
+// ── Legend ──────────────────────────────────────────────────────────────────────
+
+function Legend() {
+    return (
+        <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg px-3 py-2 text-[10px] md:text-xs space-y-1 z-10">
+            <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" />
+                <span className="text-gray-600">Alerta activa</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
+                <span className="text-gray-600">Alerta recibida</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
+                <span className="text-gray-600">En camino</span>
+            </div>
+        </div>
+    );
+}
+
+// ── Door gap (white div that covers part of a border to simulate an open door) ─
+
+function DoorGap({ side }: { side: 'bottom' | 'top' }) {
+    const positionClasses =
+        side === 'bottom'
+            ? 'bottom-[-2px] left-1/2 -translate-x-1/2 w-6 md:w-8 h-[3px]'
+            : 'top-[-2px] left-1/2 -translate-x-1/2 w-6 md:w-8 h-[3px]';
+    return <div className={`absolute ${positionClasses} bg-gray-50 z-[1]`} />;
+}
+
+// ── Room component ─────────────────────────────────────────────────────────────
+
+function Room({
+    room,
+    phase,
+    animIndex,
+    totalRooms,
+}: {
+    room: RoomData;
+    phase: number;
+    animIndex: number;
+    totalRooms: number;
 }) {
-    const ad = ALERT_DELAY(col);
-    const rd = RESPONSE_DELAY(col);
-    const isEnCamino = response === 'en_camino';
+    const { label, person, isSource, response } = room;
+
+    // Determine visual state based on phase
+    const isAlerted = isSource && phase >= 1;
+    const isReceived = !isSource && phase >= 3;
+    const showResponse = !isSource && phase >= 4;
+    const showSourceBadge = isSource && phase >= 5;
+
+    // Room border/bg classes
+    let borderClass = 'border-gray-400';
+    let bgClass = 'bg-white';
+    if (isAlerted) {
+        borderClass = 'border-red-400';
+        bgClass = 'bg-red-50';
+    }
+    if (isReceived) {
+        borderClass = 'border-blue-400';
+        bgClass = 'bg-blue-50';
+    }
+
+    const lineDelay = roomLineDelay(animIndex, totalRooms);
+    const badgeDelay = responseBadgeDelay(animIndex, totalRooms);
 
     return (
-        <div className="relative">
-            <motion.div
-                className={`relative p-3 sm:p-4 rounded-xl border-2 flex items-center gap-2 sm:gap-3 ${
-                    isSource
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-white border-gray-200'
-                }`}
-                {...(isSource
-                    ? {
-                          animate: { scale: [1, 0.95, 1.05, 1] },
-                          transition: {
-                              duration: 0.5,
-                              delay: 0.8,
-                              times: [0, 0.3, 0.7, 1],
-                          },
-                      }
-                    : {
-                          animate: {
-                              backgroundColor: [
-                                  '#ffffff',
-                                  '#dbeafe',
-                                  '#dbeafe',
-                                  '#ffffff',
-                              ],
-                              borderColor: [
-                                  '#e5e7eb',
-                                  '#3b82f6',
-                                  '#3b82f6',
-                                  '#e5e7eb',
-                              ],
-                          },
-                          transition: {
-                              duration: 2,
-                              delay: ad,
-                              times: [0, 0.15, 0.7, 1],
-                          },
-                      })}
-            >
-                {/* Icono */}
-                <div
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        isSource ? 'bg-blue-600' : 'bg-gray-100'
-                    }`}
+        <motion.div
+            className={`relative border-2 ${borderClass} ${bgClass} rounded-md p-2 md:p-3 flex flex-col justify-between min-h-[70px] md:min-h-[90px] transition-colors duration-500`}
+            {...(isSource && phase >= 1
+                ? {
+                      animate: {
+                          borderColor: ['#f87171', '#ef4444', '#f87171'],
+                      },
+                      transition: {
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                      },
+                  }
+                : !isSource && phase >= 3
+                  ? {
+                        initial: { backgroundColor: '#ffffff' },
+                        animate: { backgroundColor: '#eff6ff' },
+                        transition: {
+                            duration: 0.6,
+                            delay: lineDelay - TIMING.lineToRoomsStart,
+                        },
+                    }
+                  : {})}
+        >
+            {/* Door gap */}
+            {topRooms.includes(room) && <DoorGap side="bottom" />}
+            {bottomRooms.includes(room) && <DoorGap side="top" />}
+
+            {/* Room label */}
+            <p className="text-[10px] md:text-xs font-bold text-gray-900 leading-tight">
+                {label}
+            </p>
+
+            {/* Person */}
+            <div className="flex items-center gap-1 mt-1">
+                <svg
+                    className="w-3 h-3 text-gray-400 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    viewBox="0 0 24 24"
                 >
-                    {isSource ? (
-                        <svg
-                            className="w-4 h-4 sm:w-5 sm:h-5 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                    />
+                </svg>
+                <p className="text-[9px] md:text-[11px] text-gray-600 truncate leading-tight">
+                    {person}
+                </p>
+            </div>
+
+            {/* Source status */}
+            {isSource && (
+                <div className="mt-1">
+                    {!showSourceBadge ? (
+                        <motion.p
+                            className="text-[9px] md:text-[10px] font-semibold text-red-600"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: phase >= 1 ? 1 : 0 }}
+                            transition={{ duration: 0.3 }}
                         >
-                            <path
-                                fillRule="evenodd"
-                                d="M11.484 2.17a.75.75 0 0 1 1.032 0 11.209 11.209 0 0 0 7.877 3.08.75.75 0 0 1 .722.515 12.74 12.74 0 0 1 .635 3.985c0 5.942-4.064 10.933-9.563 12.348a.749.749 0 0 1-.374 0C6.314 20.683 2.25 15.692 2.25 9.75c0-1.39.223-2.73.635-3.985a.75.75 0 0 1 .722-.516l.143.001a11.209 11.209 0 0 0 7.734-3.08ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75ZM12 15a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75H12Z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
+                            Genera alerta
+                        </motion.p>
                     ) : (
-                        <svg
-                            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={1.5}
-                            viewBox="0 0 24 24"
+                        <motion.div
+                            className="inline-flex items-center gap-1 bg-green-100 text-green-700 border border-green-300 rounded px-1.5 py-0.5 text-[9px] md:text-[10px] font-bold"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.4 }}
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25A2.25 2.25 0 0 1 5.25 3h13.5A2.25 2.25 0 0 1 21 5.25Z"
-                            />
-                        </svg>
+                            {enCaminoCount} en camino
+                        </motion.div>
                     )}
                 </div>
+            )}
 
-                {/* Texto */}
-                <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                        {label}
-                    </p>
-                    <p className="text-xs sm:text-sm font-bold text-gray-700 truncate flex items-center gap-1">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                        {doctor}
-                    </p>
-                    {isSource && (
-                        <div className="relative h-3 sm:h-4">
-                            <motion.p
-                                className="absolute text-[10px] sm:text-xs text-blue-600 font-semibold whitespace-nowrap"
-                                animate={{ opacity: 0 }}
-                                transition={{ duration: 0.4, delay: SOURCE_RECEIVE - 0.4 }}
-                            >
-                                Genera alerta
-                            </motion.p>
-                            <motion.p
-                                className="absolute text-[10px] sm:text-xs text-green-600 font-semibold whitespace-nowrap"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.4, delay: SOURCE_RECEIVE }}
-                            >
-                                {enCaminoRooms.length} vienen en camino
-                            </motion.p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Badge rojo alerta */}
-                {!isSource && (
-                    <motion.div
-                        className="absolute top-1.5 right-1.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full border-2 border-white"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{
-                            scale: [0, 1.2, 1, 1, 0],
-                            opacity: [0, 1, 1, 1, 0],
-                        }}
-                        transition={{
-                            duration: 3,
-                            delay: ad,
-                            times: [0, 0.1, 0.2, 0.8, 1],
-                        }}
-                    />
-                )}
-
-                {/* Overlay verde para salas "en camino" — dentro del card */}
-                {isEnCamino && (
-                    <motion.div
-                        className="absolute inset-0 rounded-xl border-2 border-green-400 pointer-events-none"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.4, delay: rd }}
-                    />
-                )}
-
-                {/* Overlay verde para Consulta 1 al recibir — dentro del card */}
-                {isSource && (
-                    <motion.div
-                        className="absolute inset-0 rounded-xl border-2 border-green-400 pointer-events-none"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.4, delay: SOURCE_RECEIVE }}
-                    />
-                )}
-            </motion.div>
-
-            {/* Etiqueta de respuesta debajo de la tarjeta — fuera del borde verde */}
-            {response && (
+            {/* Response badge */}
+            {!isSource && showResponse && response && (
                 <motion.div
-                    className={`mt-1.5 text-center py-1 sm:py-1.5 rounded-lg font-bold text-[10px] sm:text-xs ${
-                        isEnCamino
+                    className={`mt-1 inline-flex items-center rounded px-1.5 py-0.5 text-[9px] md:text-[10px] font-bold ${
+                        response === 'en_camino'
                             ? 'bg-green-100 text-green-700 border border-green-300'
                             : 'bg-gray-100 text-gray-500 border border-gray-200'
                     }`}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: rd }}
+                    transition={{
+                        duration: 0.4,
+                        delay: badgeDelay - TIMING.responseBadgesStart,
+                    }}
                 >
-                    {isEnCamino ? 'En camino' : 'Recibido'}
+                    {response === 'en_camino' ? 'En camino' : 'Recibido'}
                 </motion.div>
             )}
-        </div>
+
+            {/* Alert indicator dot for source room */}
+            {isSource && phase >= 1 && (
+                <motion.div
+                    className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-white z-[2]"
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                />
+            )}
+        </motion.div>
     );
 }
 
-function Connector({
-    col,
-    hasGreenPhase,
-}: {
-    col: number;
-    hasGreenPhase: boolean;
-}) {
-    const ad = ALERT_DELAY(col);
-    const rd = RESPONSE_DELAY(col);
+// ── SVG Connection Lines ───────────────────────────────────────────────────────
+
+/*
+ * ViewBox: 0 0 600 400
+ *
+ * Grid layout (3 columns equally spaced):
+ *   Col centers: x = 100, 300, 500
+ *
+ * Row layout:
+ *   Top rooms: y center ≈ 80
+ *   Top room bottom edge: y ≈ 130
+ *   Hallway: y = 170–230 (center at 200)
+ *   Bottom room top edge: y ≈ 270
+ *   Bottom rooms: y center ≈ 320
+ *
+ * Paths from Consulta 1 (x=100):
+ *   1. Down from Consulta 1 to hallway center: (100, 130) → (100, 200)
+ *   2. Along hallway left:  (100, 200) → (300, 200)
+ *   3. Along hallway right: (300, 200) → (500, 200)
+ *   4. Up to Consulta 2: (300, 200) → (300, 130)
+ *   5. Up to Consulta 3: (500, 200) → (500, 130)
+ *   6. Down to Recepción: (100, 200) → (100, 270)
+ *   7. Down to Consulta 4: (300, 200) → (300, 270)
+ *   8. Down to Seguridad: (500, 200) → (500, 270)
+ */
+
+interface LineConfig {
+    path: string;
+    delay: number;
+    duration: number;
+    color: string;
+}
+
+function ConnectionLines({ phase }: { phase: number }) {
+    if (phase < 2) return null;
+
+    const totalTargets = 5; // rooms that receive lines (excluding source)
+
+    const lines: LineConfig[] = [
+        // 1. Consulta 1 down to hallway
+        {
+            path: 'M 100 130 L 100 200',
+            delay: TIMING.lineToHallway,
+            duration: 0.5,
+            color: '#3b82f6',
+        },
+        // 2. Hallway left to center
+        {
+            path: 'M 100 200 L 300 200',
+            delay: TIMING.lineBranch,
+            duration: 0.5,
+            color: '#3b82f6',
+        },
+        // 3. Hallway center to right
+        {
+            path: 'M 300 200 L 500 200',
+            delay: TIMING.lineBranch + 0.2,
+            duration: 0.5,
+            color: '#3b82f6',
+        },
+        // 4. Up to Consulta 2
+        {
+            path: 'M 300 200 L 300 130',
+            delay: roomLineDelay(0, totalTargets),
+            duration: 0.4,
+            color: '#3b82f6',
+        },
+        // 5. Up to Consulta 3
+        {
+            path: 'M 500 200 L 500 130',
+            delay: roomLineDelay(1, totalTargets),
+            duration: 0.4,
+            color: '#3b82f6',
+        },
+        // 6. Down to Recepción
+        {
+            path: 'M 100 200 L 100 270',
+            delay: roomLineDelay(2, totalTargets),
+            duration: 0.4,
+            color: '#3b82f6',
+        },
+        // 7. Down to Consulta 4
+        {
+            path: 'M 300 200 L 300 270',
+            delay: roomLineDelay(3, totalTargets),
+            duration: 0.4,
+            color: '#3b82f6',
+        },
+        // 8. Down to Seguridad
+        {
+            path: 'M 500 200 L 500 270',
+            delay: roomLineDelay(4, totalTargets),
+            duration: 0.4,
+            color: '#3b82f6',
+        },
+    ];
+
     return (
-        <div className="flex justify-center relative">
-            {/* Fase azul — destello temporal */}
-            <motion.div
-                className="w-0.5 h-5 sm:h-7"
-                animate={{
-                    backgroundColor: [
-                        '#e5e7eb',
-                        '#3b82f6',
-                        '#3b82f6',
-                        '#e5e7eb',
-                    ],
-                }}
-                transition={{
-                    duration: 2,
-                    delay: ad - 0.2,
-                    times: [0, 0.1, 0.7, 1],
-                }}
-            />
-            {/* Fase verde — aparece y se queda */}
-            {hasGreenPhase && (
-                <motion.div className="absolute inset-0 flex justify-center">
-                    <motion.div
-                        className="w-0.5 h-5 sm:h-7"
-                        initial={{ backgroundColor: 'transparent' }}
-                        animate={{ backgroundColor: '#22c55e' }}
-                        transition={{ duration: 0.4, delay: rd }}
-                    />
-                </motion.div>
+        <svg
+            className="absolute inset-0 w-full h-full pointer-events-none z-[5]"
+            viewBox="0 0 600 400"
+            preserveAspectRatio="none"
+            fill="none"
+        >
+            {lines.map((line, i) => (
+                <motion.path
+                    key={i}
+                    d={line.path}
+                    stroke={line.color}
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    fill="none"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.7 }}
+                    transition={{
+                        pathLength: {
+                            duration: line.duration,
+                            delay: line.delay,
+                            ease: 'easeInOut',
+                        },
+                        opacity: { duration: 0.1, delay: line.delay },
+                    }}
+                />
+            ))}
+
+            {/* Animated pulse dot traveling from source */}
+            {phase >= 2 && (
+                <motion.circle
+                    r={4}
+                    fill="#3b82f6"
+                    initial={{ cx: 100, cy: 130, opacity: 0 }}
+                    animate={{
+                        cx: [100, 100, 300, 500],
+                        cy: [130, 200, 200, 200],
+                        opacity: [0, 1, 1, 0],
+                    }}
+                    transition={{
+                        duration: 2,
+                        delay: TIMING.lineToHallway,
+                        ease: 'easeInOut',
+                    }}
+                />
             )}
-        </div>
+        </svg>
     );
 }
 
-const LOOP_DURATION = 11; // segundos totales del ciclo (animación ~8.5s + 2.5s pausa)
+// ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AlertDemo() {
     const [loopKey, setLoopKey] = useState(0);
+    const [phase, setPhase] = useState(0);
 
+    // Animation loop: reset everything every LOOP_DURATION seconds
     useEffect(() => {
         const timer = setInterval(() => {
             setLoopKey((k) => k + 1);
+            setPhase(0);
         }, LOOP_DURATION * 1000);
         return () => clearInterval(timer);
     }, []);
 
+    // Phase progression within each loop
+    useEffect(() => {
+        const timers: ReturnType<typeof setTimeout>[] = [];
+
+        // Phase 1: Alert flash on Consulta 1 (0.8s)
+        timers.push(setTimeout(() => setPhase(1), TIMING.alertFlash * 1000));
+
+        // Phase 2: SVG lines start drawing (1.2s)
+        timers.push(setTimeout(() => setPhase(2), TIMING.lineToHallway * 1000));
+
+        // Phase 3: Rooms highlight as lines reach them (2.0s)
+        timers.push(setTimeout(() => setPhase(3), TIMING.roomHighlightStart * 1000));
+
+        // Phase 4: Response badges appear (4.5s)
+        timers.push(setTimeout(() => setPhase(4), TIMING.responseBadgesStart * 1000));
+
+        // Phase 5: Source badge shows "3 en camino" (6.5s)
+        timers.push(setTimeout(() => setPhase(5), TIMING.sourceBadge * 1000));
+
+        return () => timers.forEach(clearTimeout);
+    }, [loopKey]);
+
     return (
-        <section id="demo" className="pt-32 pb-20 bg-white">
-            <div key={loopKey} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Consultas superiores */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                    {topRooms.map((room, i) => (
-                        <div key={room.label} className="relative">
-                            {/* Notificaciones WhatsApp encima de Consulta 1 */}
-                            {room.isSource && (
-                                <div className="absolute bottom-full left-0 right-0 mb-2 flex flex-col items-start gap-1.5 z-10">
-                                    {enCaminoRooms.map((room, idx) => (
-                                        <motion.div
-                                            key={room.label}
-                                            className="bg-[#dcf8c6] text-gray-800 text-[9px] sm:text-[11px] font-medium px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg rounded-bl-none shadow-sm max-w-full relative"
-                                            initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            transition={{ duration: 0.3, delay: SOURCE_RECEIVE + idx * 0.4 }}
-                                        >
-                                            <span className="font-bold text-green-700 block text-[8px] sm:text-[10px]">{room.label} · {room.doctor}</span>
-                                            <span>Voy en camino</span>
-                                            {/* Colita del mensaje */}
-                                            <div className="absolute bottom-0 -left-1.5 w-3 h-3 overflow-hidden">
-                                                <div className="bg-[#dcf8c6] w-3 h-3 rotate-45 translate-x-1.5 -translate-y-0.5" />
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            )}
-                            <RoomCard {...room} col={i} />
+        <section id="demo" className="py-24 bg-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Floor plan container */}
+                <div
+                    key={loopKey}
+                    className="relative bg-gray-50 border-2 border-gray-300 rounded-xl overflow-hidden"
+                >
+                    {/* Title bar */}
+                    <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 md:px-5 md:py-3">
+                        <h3 className="text-xs md:text-sm font-bold text-gray-700 tracking-wide uppercase">
+                            Planta 0 — Centro Médico
+                        </h3>
+                    </div>
+
+                    {/* Legend */}
+                    <Legend />
+
+                    {/* Floor plan content */}
+                    <div className="relative p-3 md:p-6">
+                        {/* Top row of rooms */}
+                        <div className="grid grid-cols-3 gap-2 md:gap-4">
+                            {topRooms.map((room, i) => (
+                                <Room
+                                    key={room.label}
+                                    room={room}
+                                    phase={phase}
+                                    animIndex={i}
+                                    totalRooms={5}
+                                />
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                {/* Conectores superiores */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                    {topRooms.map((room, i) => (
-                        <Connector
-                            key={`top-${i}`}
-                            col={i}
-                            hasGreenPhase={
-                                room.isSource ||
-                                room.response === 'en_camino'
-                            }
-                        />
-                    ))}
-                </div>
+                        {/* Hallway */}
+                        <div className="my-3 md:my-5 relative h-12 md:h-16 bg-gray-100 border border-gray-300 rounded flex items-center justify-center">
+                            <span className="text-[10px] md:text-xs font-bold text-gray-400 tracking-[0.2em] uppercase select-none">
+                                Pasillo · Planta 0
+                            </span>
+                        </div>
 
-                {/* Pasillo */}
-                <div className="relative h-10 sm:h-12 bg-gray-100 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center">
-                    <span className="relative text-[10px] sm:text-xs font-bold text-gray-400 tracking-[0.2em] uppercase">
-                        Pasillo · Planta 0
-                    </span>
-                </div>
+                        {/* Bottom row of rooms */}
+                        <div className="grid grid-cols-3 gap-2 md:gap-4">
+                            {bottomRooms.map((room, i) => (
+                                <Room
+                                    key={room.label}
+                                    room={room}
+                                    phase={phase}
+                                    animIndex={i + 2}
+                                    totalRooms={5}
+                                />
+                            ))}
+                        </div>
 
-                {/* Conectores inferiores */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                    {bottomRooms.map((room, i) => (
-                        <Connector
-                            key={`bot-${i}`}
-                            col={i}
-                            hasGreenPhase={room.response === 'en_camino'}
-                        />
-                    ))}
-                </div>
-
-                {/* Consultas inferiores */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                    {bottomRooms.map((room, i) => (
-                        <RoomCard key={room.label} {...room} col={i} />
-                    ))}
+                        {/* SVG connection lines overlay */}
+                        <ConnectionLines phase={phase} />
+                    </div>
                 </div>
             </div>
         </section>
