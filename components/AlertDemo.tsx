@@ -95,11 +95,11 @@ const travelDur = T.particlesEnd - T.particlesStart - 0.5;
 
 const COL = {
   white: new THREE.Color('#ffffff'),
-  roomDefault: new THREE.Color('#f9fafb'),
+  roomDefault: new THREE.Color('#ffffff'),
   blue: new THREE.Color('#dbeafe'),
   green: new THREE.Color('#dcfce7'),
   red: new THREE.Color('#fee2e2'),
-  edgeDefault: new THREE.Color('#d1d5db'),
+  edgeDefault: new THREE.Color('#e5e7eb'),
   edgeRed: new THREE.Color('#f87171'),
   edgeGreen: new THREE.Color('#86efac'),
   edgeBlue: new THREE.Color('#93c5fd'),
@@ -113,7 +113,7 @@ function CameraSetup() {
     camera.position.set(8, 8, 8);
     camera.lookAt(0, 0, 0);
     if (camera instanceof THREE.OrthographicCamera) {
-      camera.zoom = 42;
+      camera.zoom = 62;
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -137,21 +137,21 @@ function Floor() {
       {/* Main floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <planeGeometry args={[11, 7]} />
-        <meshStandardMaterial color="#f3f4f6" />
+        <meshStandardMaterial color="#fafafa" />
       </mesh>
       {/* Hallway strip */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
         <planeGeometry args={[11, 1.2]} />
-        <meshStandardMaterial color="#e5e7eb" />
+        <meshStandardMaterial color="#f3f4f6" />
       </mesh>
       {/* Hallway border lines */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -0.6]}>
         <planeGeometry args={[11, 0.02]} />
-        <meshBasicMaterial color="#d1d5db" />
+        <meshBasicMaterial color="#e5e7eb" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0.6]}>
         <planeGeometry args={[11, 0.02]} />
-        <meshBasicMaterial color="#d1d5db" />
+        <meshBasicMaterial color="#e5e7eb" />
       </mesh>
     </group>
   );
@@ -168,7 +168,7 @@ function RoomBox({ room, timeRef }: { room: RoomData; timeRef: React.MutableRefO
   const edgesGeo = useMemo(() => new THREE.EdgesGeometry(boxGeo), [boxGeo]);
 
   const edgeLine = useMemo(() => {
-    const mat = new THREE.LineBasicMaterial({ color: '#d1d5db' });
+    const mat = new THREE.LineBasicMaterial({ color: '#e5e7eb' });
     return new THREE.LineSegments(edgesGeo, mat);
   }, [edgesGeo]);
 
@@ -239,7 +239,7 @@ function RoomBox({ room, timeRef }: { room: RoomData; timeRef: React.MutableRefO
       {/* Room floor (visible colored surface) */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
         <planeGeometry args={[2.6, 1.4]} />
-        <meshStandardMaterial ref={floorMatRef} color="#f9fafb" />
+        <meshStandardMaterial ref={floorMatRef} color="#ffffff" />
       </mesh>
       {/* Walls (semitransparent box) */}
       <mesh position={[0, 0.3, 0]} geometry={boxGeo}>
@@ -514,14 +514,14 @@ export default function AlertDemo() {
   return (
     <section id="demo" className="py-24 bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative h-[380px] md:h-[520px] w-full rounded-2xl overflow-hidden border border-gray-200 bg-[#f8f9fa] shadow-sm">
+        <div className="relative h-[420px] md:h-[600px] w-full rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
           <PlanTitle />
           <Legend />
           {mounted ? (
             <Canvas
               orthographic
-              camera={{ position: [8, 8, 8], zoom: 42, near: 0.1, far: 100 }}
-              style={{ background: '#f8f9fa' }}
+              camera={{ position: [8, 8, 8], zoom: 62, near: 0.1, far: 100 }}
+              style={{ background: '#ffffff' }}
             >
               <Scene />
             </Canvas>
