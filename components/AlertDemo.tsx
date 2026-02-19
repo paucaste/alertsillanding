@@ -99,7 +99,7 @@ const COL = {
   blue: new THREE.Color('#dbeafe'),
   green: new THREE.Color('#dcfce7'),
   red: new THREE.Color('#fee2e2'),
-  edgeDefault: new THREE.Color('#e5e7eb'),
+  edgeDefault: new THREE.Color('#e8ecf0'),
   edgeRed: new THREE.Color('#f87171'),
   edgeGreen: new THREE.Color('#86efac'),
   edgeBlue: new THREE.Color('#93c5fd'),
@@ -113,7 +113,7 @@ function CameraSetup() {
     camera.position.set(8, 8, 8);
     camera.lookAt(0, 0, 0);
     if (camera instanceof THREE.OrthographicCamera) {
-      camera.zoom = 62;
+      camera.zoom = 80;
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -137,21 +137,21 @@ function Floor() {
       {/* Main floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <planeGeometry args={[11, 7]} />
-        <meshStandardMaterial color="#fafafa" />
+        <meshStandardMaterial color="#ffffff" />
       </mesh>
       {/* Hallway strip */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
         <planeGeometry args={[11, 1.2]} />
-        <meshStandardMaterial color="#f3f4f6" />
+        <meshStandardMaterial color="#f9fafb" />
       </mesh>
       {/* Hallway border lines */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -0.6]}>
         <planeGeometry args={[11, 0.02]} />
-        <meshBasicMaterial color="#e5e7eb" />
+        <meshBasicMaterial color="#f3f4f6" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0.6]}>
         <planeGeometry args={[11, 0.02]} />
-        <meshBasicMaterial color="#e5e7eb" />
+        <meshBasicMaterial color="#f3f4f6" />
       </mesh>
     </group>
   );
@@ -168,7 +168,7 @@ function RoomBox({ room, timeRef }: { room: RoomData; timeRef: React.MutableRefO
   const edgesGeo = useMemo(() => new THREE.EdgesGeometry(boxGeo), [boxGeo]);
 
   const edgeLine = useMemo(() => {
-    const mat = new THREE.LineBasicMaterial({ color: '#e5e7eb' });
+    const mat = new THREE.LineBasicMaterial({ color: '#e8ecf0' });
     return new THREE.LineSegments(edgesGeo, mat);
   }, [edgesGeo]);
 
@@ -388,26 +388,26 @@ function RoomLabel({ room, timeRef }: { room: RoomData; timeRef: React.MutableRe
       center
       style={{ pointerEvents: 'none', userSelect: 'none' }}
     >
-      <div className="text-center whitespace-nowrap" style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
-        <p className="text-[11px] font-bold text-gray-800 leading-tight drop-shadow-sm">{room.label}</p>
-        <p className="text-[9px] text-gray-500 leading-tight">{room.person}</p>
+      <div className="text-center whitespace-nowrap">
+        <p className="text-sm font-bold text-gray-900 leading-tight">{room.label}</p>
+        <p className="text-xs text-gray-600 leading-tight mt-0.5">{room.person}</p>
 
         {room.isSource && badge === 'alert' && (
-          <div className="mt-0.5">
-            <span className="text-[8px] font-bold text-red-600 animate-pulse">Genera alerta</span>
+          <div className="mt-1">
+            <span className="text-xs font-bold text-red-600 animate-pulse">Genera alerta</span>
           </div>
         )}
         {room.isSource && badge === 'count' && (
-          <div className="mt-0.5">
-            <span className="inline-flex items-center bg-green-100 text-green-700 border border-green-300 rounded px-1.5 py-0.5 text-[8px] font-bold">
+          <div className="mt-1">
+            <span className="inline-flex items-center bg-green-100 text-green-700 border border-green-300 rounded-md px-2 py-1 text-xs font-bold">
               {enCaminoCount} en camino
             </span>
           </div>
         )}
 
         {!room.isSource && badge === 'response' && room.response && (
-          <div className="mt-0.5">
-            <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[8px] font-bold ${
+          <div className="mt-1">
+            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-bold ${
               room.response === 'en_camino'
                 ? 'bg-green-100 text-green-700 border border-green-300'
                 : 'bg-blue-100 text-blue-600 border border-blue-200'
@@ -426,7 +426,7 @@ function RoomLabel({ room, timeRef }: { room: RoomData; timeRef: React.MutableRe
 function HallwayLabel() {
   return (
     <Html position={[0, 0.05, 0]} center style={{ pointerEvents: 'none', userSelect: 'none' }}>
-      <p className="text-[9px] font-bold text-gray-400 tracking-[0.2em] uppercase whitespace-nowrap">
+      <p className="text-xs font-bold text-gray-400 tracking-[0.25em] uppercase whitespace-nowrap">
         Pasillo · Planta 0
       </p>
     </Html>
@@ -441,9 +441,9 @@ function Scene() {
   return (
     <>
       <CameraSetup />
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[5, 10, 5]} intensity={0.6} />
-      <directionalLight position={[-3, 6, -3]} intensity={0.3} />
+      <ambientLight intensity={1.2} />
+      <directionalLight position={[5, 10, 5]} intensity={0.4} />
+      <directionalLight position={[-3, 6, -3]} intensity={0.2} />
 
       <AnimationClock timeRef={timeRef} />
       <Floor />
@@ -513,14 +513,14 @@ export default function AlertDemo() {
 
   return (
     <section id="demo" className="py-24 bg-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative h-[420px] md:h-[600px] w-full rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+      <div className="w-full px-0">
+        <div className="relative h-[450px] md:h-[700px] w-full overflow-hidden bg-white">
           <PlanTitle />
           <Legend />
           {mounted ? (
             <Canvas
               orthographic
-              camera={{ position: [8, 8, 8], zoom: 62, near: 0.1, far: 100 }}
+              camera={{ position: [8, 8, 8], zoom: 80, near: 0.1, far: 100 }}
               style={{ background: '#ffffff' }}
             >
               <Scene />
