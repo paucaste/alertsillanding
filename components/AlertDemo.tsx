@@ -263,7 +263,7 @@ export default function AlertDemo() {
     }, []);
 
     return (
-        <section className="pt-32 pb-20 bg-white">
+        <section id="demo" className="pt-32 pb-20 bg-white">
             <div key={loopKey} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Consultas superiores */}
                 <div className="grid grid-cols-3 gap-3 sm:gap-6">
@@ -331,25 +331,6 @@ export default function AlertDemo() {
                 <div className="grid grid-cols-3 gap-3 sm:gap-6">
                     {bottomRooms.map((room, i) => (
                         <RoomCard key={room.label} {...room} col={i} />
-                    ))}
-                </div>
-
-
-                {/* Explicación paso a paso */}
-                <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-                    {[
-                        'Un profesional detecta una situación de riesgo en su consulta',
-                        'Pulsa el botón de alerta en su dispositivo',
-                        'Todo el centro responde al instante: "En camino" o "Recibido"',
-                    ].map((text, i) => (
-                        <div key={i} className="text-center">
-                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold mx-auto mb-3 border border-blue-100">
-                                {i + 1}
-                            </div>
-                            <p className="text-sm text-gray-700 font-medium">
-                                {text}
-                            </p>
-                        </div>
                     ))}
                 </div>
             </div>
