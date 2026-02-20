@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { motion } from 'framer-motion';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -388,7 +389,7 @@ function RoomLabel({ room, timeRef }: { room: RoomData; timeRef: React.MutableRe
       center
       style={{ pointerEvents: 'none', userSelect: 'none' }}
     >
-      <div className="text-center whitespace-nowrap">
+      <div className="text-center whitespace-nowrap backdrop-blur-sm bg-white/80 rounded-lg px-3 py-2 shadow-sm">
         <p className="text-sm font-bold text-gray-900 leading-tight">{room.label}</p>
         <p className="text-xs text-gray-600 leading-tight mt-0.5">{room.person}</p>
 
@@ -513,7 +514,26 @@ export default function AlertDemo() {
 
   return (
     <section id="demo" className="py-24 bg-white">
-      <div className="w-full px-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Mira cómo funciona AlertSil en tiempo real
+          </h2>
+          <p className="mt-4 text-xl text-gray-600">
+            Simulación de alerta en un centro médico con 6 estancias
+          </p>
+        </div>
+      </div>
+
+      {/* Canvas container with scroll animation */}
+      <motion.div
+        className="w-full px-0"
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         <div className="relative h-[450px] md:h-[700px] w-full overflow-hidden bg-white">
           <PlanTitle />
           <Legend />
@@ -531,7 +551,7 @@ export default function AlertDemo() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
