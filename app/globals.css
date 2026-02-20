@@ -9,18 +9,36 @@
   66% { transform: translate(-20px, 20px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
+.animate-blob { animation: blob 7s infinite; }
+.animation-delay-2000 { animation-delay: 2s; }
 
-.animate-blob {
-  animation: blob 7s infinite;
+.scroll-smooth { scroll-behavior: smooth; }
+
+.bg-dot-grid {
+  background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
+@keyframes rotate-gradient {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.animated-border {
+  background: conic-gradient(from var(--gradient-angle), #3b82f6, #60a5fa, #93c5fd, #3b82f6);
+  animation: rotate-gradient 3s linear infinite;
 }
 
-.scroll-smooth {
-  scroll-behavior: smooth;
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3)); }
+  50% { filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)); }
 }
+.animate-glow { animation: glow-pulse 2s ease-in-out infinite; }
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -31,13 +49,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
