@@ -492,7 +492,10 @@ function PlanTitle() {
 // ── Main export ────────────────────────────────────────────────────────────────
 
 export default function AlertDemo() {
-  const mounted = typeof window !== 'undefined';
+  const [mounted, setMounted] = useState(false);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Standard Next.js client-only rendering pattern
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <section id="demo" className="py-24 bg-white">
