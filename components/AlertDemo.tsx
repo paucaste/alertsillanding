@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
@@ -106,20 +106,7 @@ const COL = {
   edgeBlue: new THREE.Color('#93c5fd'),
 };
 
-// ── Camera setup ───────────────────────────────────────────────────────────────
-
-function CameraSetup() {
-  const { camera } = useThree();
-  useEffect(() => {
-    camera.position.set(8, 8, 8);
-    camera.lookAt(0, 0, 0);
-    if (camera instanceof THREE.OrthographicCamera) {
-      camera.zoom = 80;
-      camera.updateProjectionMatrix();
-    }
-  }, [camera]);
-  return null;
-}
+// ── Camera setup (handled by Canvas props, no runtime mutation needed) ────────
 
 // ── Animation clock ────────────────────────────────────────────────────────────
 
@@ -441,7 +428,6 @@ function Scene() {
 
   return (
     <>
-      <CameraSetup />
       <ambientLight intensity={1.2} />
       <directionalLight position={[5, 10, 5]} intensity={0.4} />
       <directionalLight position={[-3, 6, -3]} intensity={0.2} />
@@ -506,11 +492,7 @@ function PlanTitle() {
 // ── Main export ────────────────────────────────────────────────────────────────
 
 export default function AlertDemo() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = typeof window !== 'undefined';
 
   return (
     <section id="demo" className="py-24 bg-white">
