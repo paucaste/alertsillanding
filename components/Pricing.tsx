@@ -1,4 +1,5 @@
 'use client';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CheckIcon } from '@heroicons/react/20/solid';
 
@@ -37,13 +38,72 @@ const tiers = [
 
 const container = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
+
+function TiltCard({
+  children,
+  className,
+  maxTilt = 8,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  maxTilt?: number;
+}) {
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const mouseX = e.clientX - centerX;
+      const mouseY = e.clientY - centerY;
+
+      const rotateX = -(mouseY / (rect.height / 2)) * maxTilt;
+      const rotateY = (mouseX / (rect.width / 2)) * maxTilt;
+
+      setRotation({ x: rotateX, y: rotateY });
+    },
+    [maxTilt],
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovering(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    setRotation({ x: 0, y: 0 });
+  }, []);
+
+  return (
+    <div style={{ perspective: '1000px' }} className="h-full">
+      <div
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className={className}
+        style={{
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transition: isHovering
+            ? 'transform 0.15s ease-out'
+            : 'transform 0.4s ease-out',
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function PricingCardContent({ tier, popular }: { tier: typeof tiers[number]; popular: boolean }) {
   return (
@@ -101,15 +161,18 @@ export default function Pricing() {
           variants={container}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.2 }}
         >
           {tiers.map((tier) => (
             <motion.div key={tier.name} variants={item}>
               {tier.mostPopular ? (
-                <div className="relative h-full">
+                <TiltCard
+                  maxTilt={10}
+                  className="relative h-full"
+                >
                   {/* Animated gradient border */}
                   <div className="absolute -inset-[2px] rounded-3xl animated-border opacity-70" />
-                  <div className="relative flex flex-col h-full p-8 rounded-3xl bg-white shadow-xl shadow-blue-500/10 z-10">
+                  <div className="relative flex flex-col h-full p-8 rounded-3xl bg-white shadow-xl shadow-[0_0_40px_rgba(59,130,246,0.15)] z-10">
                     <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                       Recomendado
                     </span>
@@ -120,16 +183,19 @@ export default function Pricing() {
                     )}
                     <PricingCardContent tier={tier} popular />
                   </div>
-                </div>
+                </TiltCard>
               ) : (
-                <div className="flex flex-col h-full p-8 rounded-3xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:shadow-xl transition-all duration-300">
+                <TiltCard
+                  maxTilt={8}
+                  className="flex flex-col h-full p-8 rounded-3xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:shadow-xl transition-shadow duration-300"
+                >
                   {tier.savings && (
                     <span className="mb-4 inline-block w-fit bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-lg uppercase">
                       {tier.savings}
                     </span>
                   )}
                   <PricingCardContent tier={tier} popular={false} />
-                </div>
+                </TiltCard>
               )}
             </motion.div>
           ))}

@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+
 import {
   LockClosedIcon,
   ShieldCheckIcon,
@@ -14,30 +14,55 @@ const badges = [
   { title: 'Soporte en español', description: 'Ayuda en tu idioma', icon: ChatBubbleLeftRightIcon },
 ];
 
+function BadgeCard({ badge }: { badge: (typeof badges)[number] }) {
+  const Icon = badge.icon;
+  return (
+    <div className="flex items-center gap-4 bg-slate-800/60 border border-white/5 rounded-2xl px-6 py-4 shrink-0">
+      <Icon className="h-8 w-8 text-blue-400 shrink-0 animate-glow" />
+      <div className="whitespace-nowrap">
+        <h3 className="text-base font-bold text-white leading-tight">{badge.title}</h3>
+        <p className="text-sm text-gray-400 leading-tight">{badge.description}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function TrustBadges() {
   return (
-    <section className="py-16 bg-slate-900">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          {badges.map((badge, i) => (
-            <div
-              key={badge.title}
-              className={`text-center ${
-                i < badges.length - 1 ? 'md:border-r md:border-white/10' : ''
-              }`}
-            >
-              <badge.icon className="h-8 w-8 text-blue-400 mx-auto mb-3 animate-glow" />
-              <h3 className="text-lg font-bold text-white mb-1">{badge.title}</h3>
-              <p className="text-sm text-gray-400">{badge.description}</p>
-            </div>
-          ))}
-        </motion.div>
+    <section className="py-16 bg-slate-900 overflow-hidden relative">
+      {/* Inline keyframe for the marquee animation */}
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
+
+      {/* Left fade overlay */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 w-24 z-10"
+        style={{ background: 'linear-gradient(to right, rgb(15 23 42), transparent)' }}
+      />
+
+      {/* Right fade overlay */}
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-24 z-10"
+        style={{ background: 'linear-gradient(to left, rgb(15 23 42), transparent)' }}
+      />
+
+      {/* Marquee track */}
+      <div
+        className="flex gap-8 w-max"
+        style={{ animation: 'marquee 30s linear infinite' }}
+      >
+        {/* First copy */}
+        {badges.map((badge) => (
+          <BadgeCard key={badge.title} badge={badge} />
+        ))}
+        {/* Duplicate for seamless loop */}
+        {badges.map((badge) => (
+          <BadgeCard key={`dup-${badge.title}`} badge={badge} />
+        ))}
       </div>
     </section>
   );

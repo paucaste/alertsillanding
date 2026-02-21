@@ -22,12 +22,12 @@ const features = [
 
 const container = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.08 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 export default function Features() {
@@ -45,25 +45,28 @@ export default function Features() {
         </div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
           variants={container}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.15 }}
         >
-          {features.map((feature) => (
-            <motion.div
-              key={feature.name}
-              variants={item}
-              className="bg-white p-8 rounded-2xl border-l-[3px] border-l-blue-500 border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-start"
-            >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-5 shadow-md shadow-blue-200/50">
-                <feature.icon className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.name}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-            </motion.div>
-          ))}
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={feature.name}
+                variants={item}
+                className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-start"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-5 shadow-md shadow-blue-200/50">
+                  <Icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.name}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>

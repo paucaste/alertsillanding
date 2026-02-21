@@ -1,7 +1,6 @@
 import Header from '../components/Header';
 import Hero from '../components/Hero';
-import AlertDemo from '../components/AlertDemo';
-import HowItWorks from '../components/HowItWorks';
+import ScrollScene from '../components/ScrollScene';
 import TargetAudience from '../components/TargetAudience';
 import Features from '../components/Features';
 import TrustBadges from '../components/TrustBadges';
@@ -15,8 +14,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <AlertDemo />
-      <HowItWorks />
+      <ScrollScene />
       <TargetAudience />
       <Features />
       <TrustBadges />
